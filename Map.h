@@ -9,6 +9,8 @@ class Map {
 public:
 	int n, m;
 	String* cityNameList;
+	int* cityXpos;
+	int* cityYpos;
 	int noOfCities;
 	char** grid;
 	Map(int n, int m);

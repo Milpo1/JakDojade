@@ -1,13 +1,15 @@
 #include "Map.h"
 using namespace std;
 bool isAlpha(char c) {
-	if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) return true;
+	if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')) return true;
 	return false;
 }
 Map::Map(int n, int m) {
 	this->n = n;
 	this->m = m;
 	this->noOfCities = 0;
+	this->cityXpos = nullptr;
+	this->cityYpos = nullptr;
 	this->cityNameList = nullptr;
 	this->grid = new char* [n];
 	for (int i = 0; i < n; i++) this->grid[i] = new char[m];
@@ -52,13 +54,17 @@ String* Map::findNameNearPoint(int x, int y) {
 }
 String* Map::getCityNames() {
 	this->cityNameList = new String[this->noOfCities];
+	this->cityXpos = new int[this->noOfCities];
+	this->cityYpos = new int[this->noOfCities];
 	int foundCities = 0;
-	for (int i = 0; i < this->n; i++) {
-		for (int j = 0; j < this->m; j++) {
+	for (int j = 0; j < this->m; j++) {
+		for (int i = 0; i < this->n; i++) {
 			if (this->grid[i][j] == CITY_CHAR) {
 				String* namePtr = findNameNearPoint(i, j);
 				this->cityNameList[foundCities] = *namePtr;
 				delete namePtr;
+				this->cityXpos[foundCities] = i;
+				this->cityYpos[foundCities] = j;
 				foundCities++;
 			}
 		}
@@ -83,4 +89,7 @@ void Map::getMap() {
 Map::~Map() {
 	for (int i = 0; i < n; i++) delete this->grid[i];
 	delete[] this->grid;
+	delete[] this->cityNameList;
+	delete[] this->cityXpos;
+	delete[] this->cityYpos;
 }
