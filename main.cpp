@@ -21,7 +21,7 @@ int main() {
 	}*/
 	map.getCityNames();
 	for (int i = 0; i < map.noOfCities; i++) {
-		cout << map.cityNameList[i] << " " << map.cityXpos[i] << " " << map.cityYpos[i] << endl;
+		cout << map.cityNameList[i] << " " << map.cityXpos[i] << " " << map.cityYpos[i] << "  ";
 	}
 
 	int** mapMatrix = getMatrix(map);

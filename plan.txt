@@ -1,0 +1,7 @@
+PLAN
+1. zbudowac mape kosztow z dowolnego wierzcholka
+	- traktowac jako wierzcholki miasta i rozwidlenia (!)
+	. mapa kosztow z jednego wierzcholka gotowa
+2. zbudowac mape wag
+	- wagi to roznice kosztow miedzy sasiednimi wierzcholkami
+	
