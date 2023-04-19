@@ -11,6 +11,7 @@ Map::Map(int n, int m) {
 	this->cityXpos = nullptr;
 	this->cityYpos = nullptr;
 	this->cityNameList = nullptr;
+	this->hasRoads = false;
 	this->grid = new char* [n];
 	for (int i = 0; i < n; i++) this->grid[i] = new char[m];
 }
@@ -67,11 +68,15 @@ String* Map::getCityNames() {
 				this->cityYpos[foundCities] = j;
 				foundCities++;
 			}
+			else if (!this->hasRoads && this->grid[i][j] == ROAD_CHAR) {
+				this->hasRoads = true;
+			}
 		}
 	}
 	if (foundCities == 0) return nullptr;
 	return this->cityNameList;
 }
+
 void Map::getMap() {
 	int mode = 0;
 	int pos = 0;
@@ -92,4 +97,13 @@ Map::~Map() {
 	delete[] this->cityNameList;
 	delete[] this->cityXpos;
 	delete[] this->cityYpos;
+}
+
+int Map::getCityIndexByCoords(int x, int y) {
+	for (int i = 0; i < noOfCities; i++) {
+		if (cityXpos[i] == x && cityYpos[i] == y) {
+			return i;
+		}
+	}
+	return -1; // City not found
 }
