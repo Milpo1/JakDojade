@@ -1,7 +1,9 @@
 PLAN
 1. zbudowac mape kosztow z dowolnego wierzcholka
-	- traktowac jako wierzcholki miasta i rozwidlenia (!)
-	. mapa kosztow z jednego wierzcholka gotowa
+	- traktowac jako wierzcholki miasta i rozwidlenia (!) (zach³annie znajdowac wierzcholki i zapisywac je w liscie sasiedztwa (wierzcholek - x, y, koszt dotarcia do wierzcholka od startu) )
+		i) poruszac sie po ulicach zawsze na przód 
+		i) w momencie znalezienia wierzcholka, po³¹czyæ go z poprzednim
 2. zbudowac mape wag
-	- wagi to roznice kosztow miedzy sasiednimi wierzcholkami
-	
+	- wagi to roznice kosztow miedzy sasiednimi wierzcholkami ( zastapic koszt w wierzcholku nastepuj¹cym roznica kosztow? )
+
+3. ? operowac dijkstra na 
