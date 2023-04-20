@@ -23,7 +23,7 @@ typedef LinkedList<graphNode>** MainAdjacencyList;
 
 LinkedList<graphNode>* getCityNeighbours(Map& map, int x, int y) {
 	LinkedList<graphNode>* adjacencyList = new LinkedList<graphNode>;
-	if (!map.hasRoads) return adjacencyList;
+	//if (!map.hasRoads) return adjacencyList;
 
 	LinkedList<gridElement> stack;
 
@@ -80,7 +80,7 @@ LinkedList<graphNode>* getCityNeighbours(Map& map, int x, int y) {
 	return adjacencyList;
 }
 
-void dijkstra(Map& map, MainAdjacencyList adjacencyList, int sourceCityId, int destCityId) {
+void dijkstra(Map& map, MainAdjacencyList adjacencyList, int sourceCityId, int destCityId, bool printRoute) {
 	int noOfCities = map.noOfCities;
 	int* distances = new int[noOfCities];
 	int* predecessors = new int[noOfCities];
@@ -123,24 +123,35 @@ void dijkstra(Map& map, MainAdjacencyList adjacencyList, int sourceCityId, int d
 			ptr = ptr->next;
 		}
 	}
-	LinkedList<int> route;
-	int routeCityId = destCityId;
-	while (routeCityId != sourceCityId) {
-		if (route.size >= noOfCities) break;
-		routeCityId = predecessors[routeCityId];
-		route.push(routeCityId);
-	}
-	route.pop();
-
 	cout << distances[destCityId];
-	while (!route.empty()) {
-		cout << " " << map.cityNameList[*route.pop()];
+
+	if (printRoute) {
+
+		LinkedList<int> route;
+		int routeCityId = destCityId;
+		while (routeCityId != sourceCityId) {
+			if (route.size >= noOfCities) break;
+			routeCityId = predecessors[routeCityId];
+			route.push(routeCityId);
+		}
+		route.pop();
+
+		while (!route.empty()) {
+			cout << " " << map.cityNameList[*route.pop()];
+		}
 	}
 	cout << endl;
 
 	delete[] distances;
 	delete[] predecessors;
 	delete[] visited;
+}
+void fillString(String* str) {
+	char c;
+	while (cin.get(c) && c != ' ') {
+		char toAppend[] = { c, '\0' };
+		*str = *str + toAppend;
+	}
 }
 
 
@@ -155,33 +166,53 @@ int main() {
 	MainAdjacencyList adjacencyList = new LinkedList<graphNode>*[map.noOfCities];
 	for (int i = 0; i < map.noOfCities; i++) {
 		adjacencyList[i] = getCityNeighbours(map, map.cityXpos[i], map.cityYpos[i]);
-
-		// Print the adjacency list (city id, weight)
-		/*cout << "City " << map.cityNameList[i] << " is adjacent to: ";
-		Node<graphNode>* ptr = adjacencyList[i]->head;
-		for (int j = 0; j < adjacencyList[i]->size; j++) {
-			int cityId = ptr->data.nodeId;
-			cout << "(" << map.cityNameList[cityId] << ", " << ptr->data.weight << ") ";
-			ptr = ptr->next;
-		}
-		cout << std::endl;*/
 	}
+
+	int noOfAirlines;
+	cin >> noOfAirlines;
+	for (int i = 0; i < noOfAirlines; i++) {
+		cin.get();
+		String sourceCityName = "", destCityName = "";
+		fillString(&sourceCityName);
+		fillString(&destCityName);
+
+		int airlineWeight;
+		cin >> airlineWeight;
+		int sourceCityId = map.getCityIndexByName(sourceCityName);
+		int destCityId = map.getCityIndexByName(destCityName);
+
+		LinkedList<graphNode>* cityNeighbourList = adjacencyList[sourceCityId];
+		Node<graphNode>* node = cityNeighbourList->head;
+
+		bool found = false;
+		while (node != nullptr) {
+			if (node->data.nodeId == destCityId) {
+				if (node->data.weight > airlineWeight) {
+					node->data.weight = airlineWeight;
+					found = true;
+					break;
+				}
+			}
+			node = node->next;
+		}
+		if (found) {
+			continue;
+		}
+		graphNode toAppend = { destCityId,airlineWeight };
+		cityNeighbourList->put(toAppend);
+	}
+
 	int noOfQueries;
 	cin >> noOfQueries;
 	char c;
 	for (int i = 0; i < noOfQueries; i++) {
 		cin.get();
-		String sourceCity = "", destCity = "";
-		while (cin.get(c) && c != ' ') {
-			char toAppend[] = { c, '\0' };
-			sourceCity = sourceCity + toAppend;
-		}
-		while (cin.get(c) && c != ' ') {
-			char toAppend[] = { c, '\0' };
-			destCity = destCity + toAppend;
-		}
-		int printRoute = cin.get() - '0';
-		dijkstra(map, adjacencyList, map.getCityIndexByName(sourceCity), map.getCityIndexByName(destCity));
+		String sourceCityName = "", destCityName = "";
+		fillString(&sourceCityName);
+		fillString(&destCityName);
+		int printRoute;
+		cin >> printRoute;
+		dijkstra(map, adjacencyList, map.getCityIndexByName(sourceCityName), map.getCityIndexByName(destCityName), printRoute);
 	}
 
 	for (int i = 0; i < map.noOfCities; i++) {
