@@ -123,10 +123,24 @@ void dijkstra(Map& map, MainAdjacencyList adjacencyList, int sourceCityId, int d
 			ptr = ptr->next;
 		}
 	}
-	for (int i = 0; i < noOfCities; i++) {
-		cout << map.cityNameList[i] << " " << distances[i] << " "
-			 << predecessors[i] << endl;
+	LinkedList<int> route;
+	int routeCityId = destCityId;
+	while (routeCityId != sourceCityId) {
+		if (route.size >= noOfCities) break;
+		routeCityId = predecessors[routeCityId];
+		route.push(routeCityId);
 	}
+	route.pop();
+
+	cout << distances[destCityId];
+	while (!route.empty()) {
+		cout << " " << map.cityNameList[*route.pop()];
+	}
+	cout << endl;
+
+	delete[] distances;
+	delete[] predecessors;
+	delete[] visited;
 }
 
 
@@ -143,21 +157,20 @@ int main() {
 		adjacencyList[i] = getCityNeighbours(map, map.cityXpos[i], map.cityYpos[i]);
 
 		// Print the adjacency list (city id, weight)
-		cout << "City " << map.cityNameList[i] << " is adjacent to: ";
+		/*cout << "City " << map.cityNameList[i] << " is adjacent to: ";
 		Node<graphNode>* ptr = adjacencyList[i]->head;
 		for (int j = 0; j < adjacencyList[i]->size; j++) {
 			int cityId = ptr->data.nodeId;
 			cout << "(" << map.cityNameList[cityId] << ", " << ptr->data.weight << ") ";
 			ptr = ptr->next;
 		}
-		cout << std::endl;
-
+		cout << std::endl;*/
 	}
 	int noOfQueries;
 	cin >> noOfQueries;
 	char c;
-	cin.get();
 	for (int i = 0; i < noOfQueries; i++) {
+		cin.get();
 		String sourceCity = "", destCity = "";
 		while (cin.get(c) && c != ' ') {
 			char toAppend[] = { c, '\0' };
@@ -168,7 +181,7 @@ int main() {
 			destCity = destCity + toAppend;
 		}
 		int printRoute = cin.get() - '0';
-		//dijkstra(map, adjacencyList, 0, 6);
+		dijkstra(map, adjacencyList, map.getCityIndexByName(sourceCity), map.getCityIndexByName(destCity));
 	}
 
 	for (int i = 0; i < map.noOfCities; i++) {

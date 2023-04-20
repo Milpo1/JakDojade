@@ -53,6 +53,15 @@ String* Map::findNameNearPoint(int x, int y) {
 	
 	return name;
 }
+int Map::getCityIndexByName(String& name)
+{
+	for (int i = 0; i < noOfCities; i++) {
+		if (cityNameList[i] == name) {
+			return i;
+		}
+	}
+	return -1;
+}
 String* Map::getCityNames() {
 	this->cityNameList = new String[this->noOfCities];
 	this->cityXpos = new int[this->noOfCities];
