@@ -199,7 +199,7 @@ int main() {
 			continue;
 		}
 		graphNode toAppend = { destCityId,airlineWeight };
-		cityNeighbourList->put(toAppend);
+		cityNeighbourList->push(toAppend);
 	}
 
 	int noOfQueries;
