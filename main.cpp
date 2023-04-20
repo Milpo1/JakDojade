@@ -3,6 +3,10 @@
 #include "Map.h"
 using namespace std;
 
+typedef LinkedList<graphNode>** MainAdjacencyList;
+
+const int MAXINT = 2147483647;
+
 struct Point {
 	int x, y;
 };
@@ -12,14 +16,16 @@ struct graphNode {
 };
 
 
-struct stackElement {
+struct gridElement {
 	int x, y, distance;
 };
 
 
 LinkedList<graphNode>* getCityNeighbours(Map& map, int x, int y) {
 	LinkedList<graphNode>* adjacencyList = new LinkedList<graphNode>;
-	LinkedList<stackElement> stack;
+	if (!map.hasRoads) return adjacencyList;
+
+	LinkedList<gridElement> stack;
 
 	bool** visitedCells = new bool* [map.n];
 	for (int i = 0; i < map.n; i++) {
@@ -29,11 +35,11 @@ LinkedList<graphNode>* getCityNeighbours(Map& map, int x, int y) {
 		}
 	}
 	visitedCells[x][y] = true;
-	stackElement toPush = { x,y,0 };
+	gridElement toPush = { x,y,0 };
 	stack.push(toPush);
 
 	while (!stack.empty()) {
-		stackElement* current = stack.pop();
+		gridElement* current = stack.pop();
 
 		int currentX = current->x;
 		int currentY = current->y;
@@ -51,17 +57,18 @@ LinkedList<graphNode>* getCityNeighbours(Map& map, int x, int y) {
 				if (visitedCells[neighbourX][neighbourY]) {
 					continue;
 				}				
+				visitedCells[neighbourX][neighbourY] = true;
 				char neighbourChar = map.grid[neighbourX][neighbourY];
 					// Check if neighbour is a city
 				if (neighbourChar == CITY_CHAR) {
-					graphNode toPush = { map.getCityIndexByCoords(neighbourX, neighbourY), currentDistance + 1 };
-					adjacencyList->push(toPush);
+					int cityId = map.getCityIndexByCoords(neighbourX, neighbourY);
+					graphNode toPush = { cityId, currentDistance + 1 };
+					adjacencyList->put(toPush);
 				}
 				else if (neighbourChar == ROAD_CHAR) {
 					// add it to the stack of visited cells
-					visitedCells[neighbourX][neighbourY] = true;
-					stackElement neighbourStackElement = { neighbourX, neighbourY, currentDistance + 1 };
-					stack.push(neighbourStackElement);
+					gridElement neighbourGridElement = { neighbourX, neighbourY, currentDistance + 1 };
+					stack.put(neighbourGridElement);
 				}
 			}
 		}
@@ -73,11 +80,51 @@ LinkedList<graphNode>* getCityNeighbours(Map& map, int x, int y) {
 	return adjacencyList;
 }
 
+void dijkstra(Map& map, MainAdjacencyList adjacencyList, int sourceCityId, int destCityId) {
+	int noOfCities = map.noOfCities;
+	int* distances = new int[noOfCities];
+	int* predecessors = new int[noOfCities];
+	bool* visited = new bool[noOfCities];
+	LinkedList<graphNode> stack;
 
-int** getMatrix(Map& map) {
-	return nullptr;
+	for (int i = 0; i < noOfCities; i++) {
+		distances[i] = MAXINT;
+		predecessors[i] = -1;
+		visited[i] = false;
+	}
+
+	distances[sourceCityId] = 0;
+	graphNode toPush = { sourceCityId, 0 };
+	stack.push(toPush);
+	
+	while (!stack.empty()) {
+		graphNode* current = stack.pop();
+		int currentCityId = current->nodeId;
+		int currentWeight = current->weight;
+
+		delete current;
+		if (visited[currentCityId]) {
+			continue;
+		}
+		visited[currentCityId] = true;
+		LinkedList<graphNode>* neighbours = adjacencyList[currentCityId];
+		Node<graphNode>* ptr = neighbours->head;
+		for (int i = 0; i < neighbours->size; i++) {
+			int neighbourCityId = ptr->data.nodeId;
+			int edgeWeight = ptr->data.weight;
+			if (!visited[neighbourCityId] && distances[currentCityId] != MAXINT
+				&& distances[currentCityId] + edgeWeight < distances[neighbourCityId]) {
+
+				distances[neighbourCityId] = distances[currentCityId] + edgeWeight;
+				predecessors[neighbourCityId] = currentCityId;
+				graphNode toPush = { neighbourCityId, distances[neighbourCityId] };
+				stack.push(toPush);
+			}
+			ptr = ptr->next;
+		}
+	}
+
 }
-
 
 
 int main() {
@@ -86,22 +133,26 @@ int main() {
 	cin >> m;
 	Map map(n, m);
 	map.getMap();
-	/*for (int j = 0; j < map.m; j++) {
-		for (int i = 0; i < map.n; i++) {
-			cout << map.grid[i][j];
-		}
-		cout << endl;
-	}*/
 	map.getCityNames();
-	/*for (int i = 0; i < map.noOfCities; i++) {
-		cout << map.cityNameList[i] << " " << map.cityXpos[i] << " " << map.cityYpos[i] << "  ";
-	}*/
-	LinkedList<graphNode>** adjacencyList = new LinkedList<graphNode>*[map.noOfCities];
+
+	MainAdjacencyList adjacencyList = new LinkedList<graphNode>*[map.noOfCities];
 	for (int i = 0; i < map.noOfCities; i++) {
 		adjacencyList[i] = getCityNeighbours(map, map.cityXpos[i], map.cityYpos[i]);
-	}
 
-	// upewnic sie ze bfs to bfs a nie dfs
-	//int** mapMatrix = getMatrix(map);
+		// Print the adjacency list (city id, weight)
+		cout << "City " << map.cityNameList[i] << " is adjacent to: ";
+		Node<graphNode>* ptr = adjacencyList[i]->head;
+		for (int j = 0; j < adjacencyList[i]->size; j++) {
+			int cityId = ptr->data.nodeId;
+			cout << "(" << map.cityNameList[cityId] << ", " << ptr->data.weight << ") ";
+			ptr = ptr->next;
+		}
+		cout << std::endl;
+
+	}
+	for (int i = 0; i < map.noOfCities; i++) {
+		delete adjacencyList[i];
+	}
+	delete[] adjacencyList;
 	return 0;
 }

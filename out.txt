@@ -1,0 +1,2 @@
+City A is adjacent to: (B, 1179644) 
+City B is adjacent to: (A, 1179644) 

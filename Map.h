@@ -22,4 +22,5 @@ public:
 	bool pointIsValid(int x, int y);
 	String* findNameNearPoint(int x, int y);
 	int getCityIndexByCoords(int x, int y);
+	int getCityIndexByName(String& name);
 };

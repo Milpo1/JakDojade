@@ -15,11 +15,13 @@ template <class T>
 class LinkedList {
 public:
     Node<T>* head;
+    Node<T>* tail;
     int size;
 
     // constructor
     LinkedList() {
         this->head = NULL;
+        this->tail = NULL;
         this->size = 0;
     }
 
@@ -38,10 +40,25 @@ public:
         Node<T>* node = new Node<T>(data);
         if (this->head == NULL) {
             this->head = node;
+            this->tail = node;
         }
         else {
             node->next = this->head;
             this->head = node;
+        }
+        this->size++;
+    }
+
+    // add an element to the end of the list
+    void put(T& data) {
+        Node<T>* node = new Node<T>(data);
+        if (this->head == NULL) {
+            this->head = node;
+            this->tail = node;
+        }
+        else {
+            this->tail->next = node;
+            this->tail = node;
         }
         this->size++;
     }
@@ -57,6 +74,7 @@ public:
 
         if (this->size == 1) {
             this->head = NULL;
+            this->tail = NULL;
         }
         else {
             this->head = node->next;
@@ -74,6 +92,39 @@ public:
         }
 
         return &this->head->data;
+    }
+
+    // insert a new node with the given data at the specified position
+    void insert(T& data, int pos) {
+        if (pos < 0) {
+            return;
+        }
+
+        if (pos > this->size) {
+            pos = this->size;
+        }
+
+        Node<T>* node = new Node<T>(data);
+
+        if (pos == 0) {
+            // insert at the beginning of the list
+            push(data);
+        }
+        else if (pos == this->size) {
+            // insert at the end of the list
+            put(data);
+        }
+        else {
+            // insert in the middle of the list
+            Node<T>* current = this->head;
+            for (int i = 0; i < pos - 1; i++) {
+                current = current->next;
+            }
+            node->next = current->next;
+            current->next = node;
+            this->size++;
+        }
+
     }
 
     // checks if a given data value is in the list
