@@ -3,8 +3,7 @@
 #include "Map.h"
 using namespace std;
 
-typedef LinkedList<graphNode>** MainAdjacencyList;
-
+#define BUFFER_SIZE 64;
 const int MAXINT = 2147483647;
 
 struct Point {
@@ -20,6 +19,7 @@ struct gridElement {
 	int x, y, distance;
 };
 
+typedef LinkedList<graphNode>** MainAdjacencyList;
 
 LinkedList<graphNode>* getCityNeighbours(Map& map, int x, int y) {
 	LinkedList<graphNode>* adjacencyList = new LinkedList<graphNode>;
@@ -118,12 +118,15 @@ void dijkstra(Map& map, MainAdjacencyList adjacencyList, int sourceCityId, int d
 				distances[neighbourCityId] = distances[currentCityId] + edgeWeight;
 				predecessors[neighbourCityId] = currentCityId;
 				graphNode toPush = { neighbourCityId, distances[neighbourCityId] };
-				stack.push(toPush);
+				stack.put(toPush);
 			}
 			ptr = ptr->next;
 		}
 	}
-
+	for (int i = 0; i < noOfCities; i++) {
+		cout << map.cityNameList[i] << " " << distances[i] << " "
+			 << predecessors[i] << endl;
+	}
 }
 
 
@@ -150,6 +153,24 @@ int main() {
 		cout << std::endl;
 
 	}
+	int noOfQueries;
+	cin >> noOfQueries;
+	char c;
+	cin.get();
+	for (int i = 0; i < noOfQueries; i++) {
+		String sourceCity = "", destCity = "";
+		while (cin.get(c) && c != ' ') {
+			char toAppend[] = { c, '\0' };
+			sourceCity = sourceCity + toAppend;
+		}
+		while (cin.get(c) && c != ' ') {
+			char toAppend[] = { c, '\0' };
+			destCity = destCity + toAppend;
+		}
+		int printRoute = cin.get() - '0';
+		//dijkstra(map, adjacencyList, 0, 6);
+	}
+
 	for (int i = 0; i < map.noOfCities; i++) {
 		delete adjacencyList[i];
 	}
