@@ -5,9 +5,11 @@ template <class T>
 struct Node {
     T data;
     Node<T>* next;
+    int priority;
     Node(T data) {
         this->data = data;
         this->next = NULL;
+        this->priority = 0;
     }
 };
 
@@ -48,6 +50,42 @@ public:
         }
         this->size++;
     }
+
+    void priority_push(T& data, int priority) {
+        Node<T>* node = new Node<T>(data);
+        node->priority = priority;
+
+        if (this->head == NULL) {
+            // list is empty, add new node as the only node in the list
+            this->head = node;
+            this->tail = node;
+        }
+        else if (node->priority < this->head->priority) {
+            // new node has the smallest priority value, add it to the beginning of the list
+            node->next = this->head;
+            this->head = node;
+        }
+        else {
+            // find the position in the list where the new node should be inserted based on priority value
+            Node<T>* current = this->head;
+            while (current->next != NULL && current->next->priority <= node->priority) {
+                current = current->next;
+            }
+
+            // insert new node at the correct position
+            node->next = current->next;
+            current->next = node;
+
+            // update tail pointer if necessary
+            if (node->next == NULL) {
+                this->tail = node;
+            }
+        }
+
+        // update list size
+        this->size++;
+    }
+
 
     // add an element to the end of the list
     void put(T& data) {

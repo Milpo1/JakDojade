@@ -23,7 +23,7 @@ typedef LinkedList<graphNode>** MainAdjacencyList;
 
 LinkedList<graphNode>* getCityNeighbours(Map& map, int x, int y) {
 	LinkedList<graphNode>* adjacencyList = new LinkedList<graphNode>;
-	//if (!map.hasRoads) return adjacencyList;
+	if (!map.hasRoads) return adjacencyList;
 
 	LinkedList<gridElement> stack;
 
@@ -112,13 +112,16 @@ void dijkstra(Map& map, MainAdjacencyList adjacencyList, int sourceCityId, int d
 		for (int i = 0; i < neighbours->size; i++) {
 			int neighbourCityId = ptr->data.nodeId;
 			int edgeWeight = ptr->data.weight;
-			if (!visited[neighbourCityId] && distances[currentCityId] != MAXINT
-				&& distances[currentCityId] + edgeWeight < distances[neighbourCityId]) {
+			int currentDistance = distances[currentCityId];
+			int neighbourDistance = distances[neighbourCityId];
+			bool neighbourVisited = visited[neighbourCityId];
+			if (!neighbourVisited && currentDistance != MAXINT
+				&& currentDistance + edgeWeight < neighbourDistance) {
 
 				distances[neighbourCityId] = distances[currentCityId] + edgeWeight;
 				predecessors[neighbourCityId] = currentCityId;
 				graphNode toPush = { neighbourCityId, distances[neighbourCityId] };
-				stack.put(toPush);
+				stack.priority_push(toPush, toPush.weight); // make it priority push
 			}
 			ptr = ptr->next;
 		}
@@ -170,7 +173,7 @@ int main() {
 
 	int noOfAirlines;
 	cin >> noOfAirlines;
-	for (int i = 0; i < noOfAirlines; i++) {
+	for (int i = 0; i < noOfAirlines; i++) { // PRZYSPIESZYC !!!
 		cin.get();
 		String sourceCityName = "", destCityName = "";
 		fillString(&sourceCityName);
@@ -200,6 +203,7 @@ int main() {
 		}
 		graphNode toAppend = { destCityId,airlineWeight };
 		cityNeighbourList->push(toAppend);
+
 	}
 
 	int noOfQueries;
