@@ -32,7 +32,7 @@ void String::clear()
 	this->str = nullptr;
 	this->blocks = 0;
 }
-int String::getLength() const
+int String::calculateLength() const
 {
 	if (this == nullptr) return 0;
 	if (this->str == nullptr) return 0;
@@ -40,10 +40,15 @@ int String::getLength() const
 	while (this->str[l++] != EOS) {}
 	return l;
 }
+int String::getLength() const
+{
+	return this->length;
+}
 void String::allocate(int length)
 {
 	if (length < 0) return;
 	this->blocks = (length - 1) / STR_BLOCK_SIZE + 1;
+	this->length = length;
 	if (this->str != nullptr)
 	{
 		char* temp = new char[this->blocks * STR_BLOCK_SIZE];
@@ -66,13 +71,13 @@ String::String()
 String::String(const String& other)
 {
 	this->str = nullptr;
-	this->blocks = 0;
+	this->blocks = other.blocks;
 	int l = other.blocks * STR_BLOCK_SIZE;
 	this->str = new char[l];
 	for (int i = 0; i < l; i++)
 		this->str[i] = other.str[i];
 }
-String::String(const char* str)
+String::String(char* str)
 {
 	this->str = nullptr;
 	this->blocks = 0;
@@ -82,6 +87,7 @@ String& String::operator=(const String& right)
 {
 	std::swap(str, ((String&)right).str);
 	this->blocks = right.blocks;
+	this->length = right.length;
 	return *this;
 }
 void String::setStr(const char* str)
@@ -105,7 +111,7 @@ bool String::operator==(const String& right)
 	if (this->str == nullptr || right.str == nullptr) return false;
 	int thisLength = this->getLength();
 	int rightLength = right.getLength();
-	if (thisLength != rightLength) return false;
+	if (thisLength != rightLength && this->length != -1 && right.length != -1) return false;
 	for (int i = 0; i < thisLength; i++)
 	{
 		if (this->str[i] != right.str[i]) return false;
@@ -126,6 +132,7 @@ String& String::operator+(const String& right)
 		{
 			this->str[i + a - 1] = right.str[i];
 		}
+		this->length = a + b - 1;
 		return *this;
 	}
 
@@ -151,6 +158,7 @@ String& String::operator+(const char* right)
 		{
 			this->str[i + a - 1] = right[i];
 		}
+		this->length = a + b - 1;
 		return *this;
 	}
 

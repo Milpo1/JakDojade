@@ -5,15 +5,17 @@
 class String
 {
 private:
-	char* str;
 	int blocks;
 public:
+	char* str; 
+	int length;
 	String();
-	String(const char* str);
+	String(char* str);
 	String(const String& other);
 	~String();
 	int getLength() const;
 	void clear();
+	int calculateLength() const;
 	void allocate(int length);
 	void setStr(const char* str);
 	void cutSpaces();

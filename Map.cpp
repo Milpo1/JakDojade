@@ -10,10 +10,11 @@ Map::Map(int n, int m) {
 	this->noOfCities = 0;
 	this->cityXpos = nullptr;
 	this->cityYpos = nullptr;
-	this->cityNameList = nullptr;
+	this->cityNameListIndexed = nullptr;
 	this->hasRoads = false;
 	this->grid = new char* [n];
 	for (int i = 0; i < n; i++) this->grid[i] = new char[m];
+	this->cityNameList = new LinkedList<City>[NUMBER_OF_CHARS * NUMBER_OF_CHARS * NUMBER_OF_CHARS];
 }
 bool Map::pointIsValid(int x, int y) {
 	if (x < 0 || x >= this->n || y < 0 || y >= this->m) return false;
@@ -49,21 +50,34 @@ String* Map::findNameNearPoint(int x, int y) {
 		*name = *name + toAppend;
 		this->grid[n][nameY] = MAP_EMPTY;
 	}
-	
-	
 	return name;
 }
-int Map::getCityIndexByName(String& name)
+int Map::hashStr(char* str)
 {
-	for (int i = 0; i < noOfCities; i++) {
-		if (cityNameList[i] == name) {
-			return i;
+	int hash;
+	if (str[0] == '\0') return NUMBER_OF_CHARS - 1;
+	hash = NUMBER_OF_CHARS*NUMBER_OF_CHARS*(str[0]-'0');
+	if (str[1] == '\0') return hash + NUMBER_OF_CHARS*NUMBER_OF_CHARS - 1;
+	hash += NUMBER_OF_CHARS*(str[1] - '0');
+	if (str[2] == '\0') return hash + NUMBER_OF_CHARS - 1;
+	hash += str[2] - '0';
+	return hash;
+}
+int Map::getCityIndexByName(char* name)
+{
+	LinkedList<City>* cityNameList = &this->cityNameList[this->hashStr(name)];
+	Node<City>* ptr = cityNameList->head;
+	while (ptr != nullptr) {
+		char* nameToCmp = ptr->data.name.str;
+		if (strcmp(nameToCmp, name) == 0) {
+			return ptr->data.id;
 		}
+		ptr = ptr->next;
 	}
 	return -1;
 }
-String* Map::getCityNames() {
-	this->cityNameList = new String[this->noOfCities];
+void Map::getCityNames() {
+	this->cityNameListIndexed = new City*[this->noOfCities];
 	this->cityXpos = new int[this->noOfCities];
 	this->cityYpos = new int[this->noOfCities];
 	int foundCities = 0;
@@ -71,7 +85,9 @@ String* Map::getCityNames() {
 		for (int i = 0; i < this->n; i++) {
 			if (this->grid[i][j] == CITY_CHAR) {
 				String* namePtr = findNameNearPoint(i, j);
-				this->cityNameList[foundCities] = *namePtr;
+				City toPush = { *namePtr, foundCities };
+				int hash = this->hashStr(namePtr->str);
+				this->cityNameListIndexed[foundCities] = this->cityNameList[hash].put(toPush);
 				delete namePtr;
 				this->cityXpos[foundCities] = i;
 				this->cityYpos[foundCities] = j;
@@ -82,8 +98,6 @@ String* Map::getCityNames() {
 			}
 		}
 	}
-	if (foundCities == 0) return nullptr;
-	return this->cityNameList;
 }
 
 void Map::getMap() {
@@ -103,6 +117,7 @@ void Map::getMap() {
 Map::~Map() {
 	for (int i = 0; i < n; i++) delete this->grid[i];
 	delete[] this->grid;
+	delete[] this->cityNameListIndexed;
 	delete[] this->cityNameList;
 	delete[] this->cityXpos;
 	delete[] this->cityYpos;

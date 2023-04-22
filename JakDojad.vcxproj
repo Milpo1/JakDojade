@@ -139,17 +139,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="LinkedList.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="MyString.cpp" />
-    <ClCompile Include="Stack.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LinkedList.h" />
+    <ClInclude Include="main.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="MyString.h" />
-    <ClInclude Include="Stack.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="plan.txt" />

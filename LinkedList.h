@@ -38,7 +38,7 @@ public:
     }
 
     // add an element to the beginning of the list
-    void push(T& data) {
+    T* push(T& data) {
         Node<T>* node = new Node<T>(data);
         if (this->head == NULL) {
             this->head = node;
@@ -49,6 +49,7 @@ public:
             this->head = node;
         }
         this->size++;
+        return &node->data;
     }
 
     void priority_push(T& data, int priority) {
@@ -88,7 +89,7 @@ public:
 
 
     // add an element to the end of the list
-    void put(T& data) {
+    T* put(T& data) {
         Node<T>* node = new Node<T>(data);
         if (this->head == NULL) {
             this->head = node;
@@ -99,6 +100,7 @@ public:
             this->tail = node;
         }
         this->size++;
+        return &node->data;
     }
 
     // remove and return the first element from the list
