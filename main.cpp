@@ -1,11 +1,10 @@
 #include <iostream>
 #include "Map.h"
 #include <chrono>
-#include "main.h"
 using namespace std::chrono;
 using namespace std;
 
-#define BUFFER_SIZE 64;
+#define BUFFER_SIZE 32
 const int MAXINT = 2147483647;
 
 struct Point {
@@ -58,10 +57,10 @@ LinkedList<graphNode>* getCityNeighbours(Map& map, int x, int y) {
 
 				if (visitedCells[neighbourX][neighbourY]) {
 					continue;
-				}				
+				}
 				visitedCells[neighbourX][neighbourY] = true;
 				char neighbourChar = map.grid[neighbourX][neighbourY];
-					// Check if neighbour is a city
+				// Check if neighbour is a city
 				if (neighbourChar == CITY_CHAR) {
 					int cityId = map.getCityIndexByCoords(neighbourX, neighbourY);
 					graphNode toPush = { cityId, currentDistance + 1 };
@@ -98,7 +97,7 @@ void dijkstra(Map& map, MainAdjacencyList adjacencyList, int sourceCityId, int d
 	distances[sourceCityId] = 0;
 	graphNode toPush = { sourceCityId, 0 };
 	stack.push(toPush);
-	
+
 	while (!stack.empty()) {
 		graphNode* current = stack.pop();
 		int currentCityId = current->nodeId;
@@ -109,6 +108,9 @@ void dijkstra(Map& map, MainAdjacencyList adjacencyList, int sourceCityId, int d
 			continue;
 		}
 		visited[currentCityId] = true;
+		if (currentCityId == destCityId) {
+			break;
+		};
 		LinkedList<graphNode>* neighbours = adjacencyList[currentCityId];
 		Node<graphNode>* ptr = neighbours->head;
 		for (int i = 0; i < neighbours->size; i++) {
@@ -199,7 +201,7 @@ int stringToInteger(char* str) {
 }
 
 int main() {
-	std::ios::sync_with_stdio(false); 
+	std::ios::sync_with_stdio(false);
 	std::cin.tie(NULL);
 	std::cout.tie(NULL);
 	int n, m;
@@ -219,16 +221,16 @@ int main() {
 	//auto stop = high_resolution_clock::now();
 	//auto duration = duration_cast<microseconds>(stop - start); 
 	getchar();
-	for (int i = 0; i < noOfAirlines; i++) { 
+	for (int i = 0; i < noOfAirlines; i++) {
 		//stop = high_resolution_clock::now();
 		//duration = duration_cast<microseconds>(stop - start);
 		//cout << duration.count() << " ";
-		char sourceCityName[32], destCityName[32], airlineWeightStr[32];
+		char sourceCityName[BUFFER_SIZE], destCityName[BUFFER_SIZE], airlineWeightStr[BUFFER_SIZE];
 		fastscan(sourceCityName);
 		fastscan(destCityName);
 		fastscan(airlineWeightStr);
 		int airlineWeight = stringToInteger(airlineWeightStr);
-		
+
 
 		int sourceCityId = map.getCityIndexByName(sourceCityName);
 		int destCityId = map.getCityIndexByName(destCityName);
@@ -250,16 +252,17 @@ int main() {
 		} //
 		graphNode toAppend = { destCityId,airlineWeight };
 		//start = high_resolution_clock::now();
-		cityNeighbourList->push(toAppend);
+		cityNeighbourList->priority_push(toAppend, destCityId);
 	}
 	int noOfQueries;
 	cin >> noOfQueries;
-	char c;
+	getchar();
 	for (int i = 0; i < noOfQueries; i++) {
-		char sourceCityName[32], destCityName[32];
-		cin >> sourceCityName >> destCityName;
-		int printRoute;
-		cin >> printRoute;
+		char sourceCityName[BUFFER_SIZE], destCityName[BUFFER_SIZE], printRouteStr[BUFFER_SIZE];
+		fastscan(sourceCityName);
+		fastscan(destCityName);
+		fastscan(printRouteStr);
+		int printRoute = stringToInteger(printRouteStr);
 		dijkstra(map, adjacencyList, map.getCityIndexByName(sourceCityName), map.getCityIndexByName(destCityName), printRoute);
 	}
 
