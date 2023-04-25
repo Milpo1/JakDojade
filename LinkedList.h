@@ -69,7 +69,7 @@ public:
         else {
             // find the position in the list where the new node should be inserted based on priority value
             Node<T>* current = this->head;
-            while (current->next != NULL && current->next->priority <= node->priority) {
+            while (current->next != NULL && current->next->priority < node->priority) {
                 current = current->next;
             }
 

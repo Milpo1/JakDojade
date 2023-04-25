@@ -82,6 +82,10 @@ LinkedList<graphNode>* getCityNeighbours(Map& map, int x, int y) {
 }
 
 void dijkstra(Map& map, MainAdjacencyList adjacencyList, int sourceCityId, int destCityId, bool printRoute) {
+	//auto start = high_resolution_clock::now();
+	//auto stop = high_resolution_clock::now();
+	//auto duration = duration_cast<microseconds>(stop - start);
+	 
 	int noOfCities = map.noOfCities;
 	int* distances = new int[noOfCities];
 	int* predecessors = new int[noOfCities];
@@ -97,7 +101,8 @@ void dijkstra(Map& map, MainAdjacencyList adjacencyList, int sourceCityId, int d
 	distances[sourceCityId] = 0;
 	graphNode toPush = { sourceCityId, 0 };
 	stack.push(toPush);
-
+	//duration = duration_cast<microseconds>(stop - start);
+	//std::cout << " " << duration.count() << " ";
 	while (!stack.empty()) {
 		graphNode* current = stack.pop();
 		int currentCityId = current->nodeId;
@@ -114,11 +119,15 @@ void dijkstra(Map& map, MainAdjacencyList adjacencyList, int sourceCityId, int d
 		LinkedList<graphNode>* neighbours = adjacencyList[currentCityId];
 		Node<graphNode>* ptr = neighbours->head;
 		for (int i = 0; i < neighbours->size; i++) {
+			//start = high_resolution_clock::now();
 			int neighbourCityId = ptr->data.nodeId;
 			int edgeWeight = ptr->data.weight;
 			int currentDistance = distances[currentCityId];
 			int neighbourDistance = distances[neighbourCityId];
 			bool neighbourVisited = visited[neighbourCityId];
+			//stop = high_resolution_clock::now();
+			//duration = duration_cast<microseconds>(stop - start);
+			//std::cout << " " << duration.count() << " ";
 			if (!neighbourVisited && currentDistance != MAXINT
 				&& currentDistance + edgeWeight < neighbourDistance) {
 
@@ -130,8 +139,8 @@ void dijkstra(Map& map, MainAdjacencyList adjacencyList, int sourceCityId, int d
 			ptr = ptr->next;
 		}
 	}
-	cout << distances[destCityId];
 
+	std::cout << distances[destCityId];
 	if (printRoute) {
 
 		LinkedList<int> route;
@@ -144,23 +153,15 @@ void dijkstra(Map& map, MainAdjacencyList adjacencyList, int sourceCityId, int d
 		route.pop();
 
 		while (!route.empty()) {
-			cout << " " << map.cityNameListIndexed[*route.pop()]->name;
+			std::cout << " " << map.cityNameListIndexed[*route.pop()]->name;
 		}
 	}
-	cout << endl;
+	std::cout << endl;
 
 	delete[] distances;
 	delete[] predecessors;
 	delete[] visited;
 }
-void fillString(String* str) {
-	char c;
-	while (cin.get(c) && c != ' ') {
-		char toAppend[] = { c, '\0' };
-		*str = *str + toAppend;
-	}
-}
-
 void fastscan(char* str) {
 	char c = getchar();
 	int i = 0;
@@ -201,7 +202,6 @@ int stringToInteger(char* str) {
 }
 
 int main() {
-	std::ios::sync_with_stdio(false);
 	std::cin.tie(NULL);
 	std::cout.tie(NULL);
 	int n, m;
@@ -217,27 +217,24 @@ int main() {
 
 	int noOfAirlines;
 	cin >> noOfAirlines;
-	//auto start = high_resolution_clock::now(); 
-	//auto stop = high_resolution_clock::now();
-	//auto duration = duration_cast<microseconds>(stop - start); 
+	char sourceCityName[BUFFER_SIZE], destCityName[BUFFER_SIZE], airlineWeightStr[BUFFER_SIZE];
 	getchar();
+	//auto start = high_resolution_clock::now();
 	for (int i = 0; i < noOfAirlines; i++) {
-		//stop = high_resolution_clock::now();
 		//duration = duration_cast<microseconds>(stop - start);
 		//cout << duration.count() << " ";
-		char sourceCityName[BUFFER_SIZE], destCityName[BUFFER_SIZE], airlineWeightStr[BUFFER_SIZE];
 		fastscan(sourceCityName);
 		fastscan(destCityName);
 		fastscan(airlineWeightStr);
-		int airlineWeight = stringToInteger(airlineWeightStr);
-
+		//start = high_resolution_clock::now();
+		int airlineWeight = atoi(airlineWeightStr);
+		//stop = high_resolution_clock::now();
 
 		int sourceCityId = map.getCityIndexByName(sourceCityName);
 		int destCityId = map.getCityIndexByName(destCityName);
 		LinkedList<graphNode>* cityNeighbourList = adjacencyList[sourceCityId];
 		Node<graphNode>* node = cityNeighbourList->head;
-		bool found = false;
-		while (node != nullptr) { // PRZYSPIESZYC !!!
+		/*while (node != nullptr) { // PRZYSPIESZYC !!!
 			if (node->data.nodeId == destCityId) {
 				if (node->data.weight > airlineWeight) {
 					node->data.weight = airlineWeight;
@@ -249,26 +246,32 @@ int main() {
 		}
 		if (found) {
 			continue;
-		} //
+		} //*/
 		graphNode toAppend = { destCityId,airlineWeight };
-		//start = high_resolution_clock::now();
-		cityNeighbourList->priority_push(toAppend, destCityId);
+		cityNeighbourList->put(toAppend);
 	}
+	//cout << duration.count() << " ";
 	int noOfQueries;
 	cin >> noOfQueries;
 	getchar();
+	char printRouteStr[BUFFER_SIZE];
 	for (int i = 0; i < noOfQueries; i++) {
-		char sourceCityName[BUFFER_SIZE], destCityName[BUFFER_SIZE], printRouteStr[BUFFER_SIZE];
 		fastscan(sourceCityName);
 		fastscan(destCityName);
 		fastscan(printRouteStr);
-		int printRoute = stringToInteger(printRouteStr);
+		int printRoute = atoi(printRouteStr);
 		dijkstra(map, adjacencyList, map.getCityIndexByName(sourceCityName), map.getCityIndexByName(destCityName), printRoute);
 	}
+	//stop = high_resolution_clock::now();
+	//duration = duration_cast<microseconds>(stop - start);
+	//cout << endl << duration.count() << " ";
 
 	for (int i = 0; i < map.noOfCities; i++) {
 		delete adjacencyList[i];
 	}
 	delete[] adjacencyList;
+	//auto stop = high_resolution_clock::now();
+	//auto duration = duration_cast<microseconds>(stop - start); std::ios::sync_with_stdio(false);
+	//cout << duration.count() << " ";
 	return 0;
 }
