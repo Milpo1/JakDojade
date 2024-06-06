@@ -1,5 +1,5 @@
 <div id="content"><h2>Jak Dojade?</h2>
-<div id="problemtext"><div id="content"><h3>autor instrukcji: <br/>Krzysztof Ocetkiewicz ETI PG</h3></div>
+Instruction made by ETI PG
 <div id="problemtext">Dana jest prostokątna mapa podzielona na kwadraty. Każde pole mapy może być puste (nieprzejezdne), być fragmentem drogi (przejezdnej w każdą stronę) lub miastem (przejezdnym tak jak droga). Nazwa każdego z miast jest podana na mapie i każda litera zajmuje jedno pole (pole z literą jest nieprzejezdne). Przebycie jednego pola zajmuje minutę. Poruszać się możemy tylko pomiędzy polami sąsiadującymi bokami.
 Dodatkowo wybrane miasta połączone są jednokierunkowymi połączeniami lotniczymi.
 <br/>
